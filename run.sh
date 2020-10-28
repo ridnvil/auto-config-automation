@@ -150,6 +150,8 @@ sudo chmod +x /etc/profile.d/maven.sh
 echo "source /etc/profile.d/maven.sh" >> ~/.bashrc
 source /etc/profile.d/maven.sh && mvn --version
 
+#Open Port
+
 #Auto Deploy
 echo "Project deploy.."
 if [ -d "/root/Automation" ]; then
@@ -161,6 +163,6 @@ cd ~/Automation
 git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/device_monitoring.git
 git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_database.git
 git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_producer.git
-git clone https://ridwan:M1r34cl3@git.this.my.id/automation_tools/automation_services/automation_services_consumer.git
+git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_consumer.git
 
 sudo systemctl daemon-reload && sudo systemctl enable appiumd && sudo systemctl start appiumd
