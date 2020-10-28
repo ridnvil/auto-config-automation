@@ -168,3 +168,7 @@ git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automatio
 git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_consumer.git
 
 sudo systemctl daemon-reload && sudo systemctl enable appiumd && sudo systemctl start appiumd
+
+#Install Docker Compose
+
+#Running docker composer
