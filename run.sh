@@ -151,6 +151,8 @@ echo "source /etc/profile.d/maven.sh" >> ~/.bashrc
 source /etc/profile.d/maven.sh && mvn --version
 
 #Open Port
+sudo firewall-cmd --zone=public --permanent --add-port=4723/tcp
+sudo firewall-cmd --zone=public --permanent --add-port=8081/tcp
 
 #Auto Deploy
 echo "Project deploy.."
