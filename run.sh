@@ -1,4 +1,6 @@
 #!/bin/bash
+gitusers=$1
+gitpasswd=$2
 #dependency checker
 if ! command -v wget &> /dev/null
 	then
@@ -156,9 +158,9 @@ if [ -d "/root/Automation" ]; then
 	mkdir ~/Automation
 fi
 cd ~/Automation
-git clone https://ridwan:M1r34cl3@git.this.my.id/automation_tools/automation_services/device_monitoring.git
-git clone https://ridwan:M1r34cl3@git.this.my.id/automation_tools/automation_services/automation_services_database.git
-git clone https://ridwan:M1r34cl3@git.this.my.id/automation_tools/automation_services/automation_services_producer.git
+git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/device_monitoring.git
+git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_database.git
+git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_producer.git
 git clone https://ridwan:M1r34cl3@git.this.my.id/automation_tools/automation_services/automation_services_consumer.git
 
 sudo systemctl daemon-reload && sudo systemctl enable appiumd && sudo systemctl start appiumd
