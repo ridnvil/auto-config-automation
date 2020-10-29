@@ -1,6 +1,34 @@
 #!/bin/bash
-gitusers=$1
-gitpasswd=$2
+#flags
+while test $# -gt 0; do
+           case "$1" in
+                -user)
+                    shift
+                    gitusers=$1
+                    shift
+                    ;;
+                -pass)
+                    shift
+                    gitpasswd=$1
+                    shift
+                    ;;
+		-khost)
+                    shift
+                    kafkahost=$1
+                    shift
+                    ;;
+                *)
+                   echo "$1 error"
+                   return 1;
+                   ;;
+          esac
+  done
+
+if [ -z "$gitusers" ] || [ -z "$gitpasswd" || [ -z "$kafkahosts"  ]; then
+    echo "usage: run.sh -user usergit -pass passwordgit -khost kafkahost" 1>&2
+    exit 1
+fi
+
 #dependency checker
 if ! command -v wget &> /dev/null
 	then
@@ -150,10 +178,6 @@ sudo chmod +x /etc/profile.d/maven.sh
 echo "source /etc/profile.d/maven.sh" >> ~/.bashrc
 source /etc/profile.d/maven.sh && mvn --version
 
-#Open Port
-sudo firewall-cmd --zone=public --permanent --add-port=4723/tcp
-sudo firewall-cmd --zone=public --permanent --add-port=8081/tcp
-
 #Auto Deploy
 echo "Project deploy.."
 if [ -d "/root/Automation" ]; then
@@ -161,14 +185,53 @@ if [ -d "/root/Automation" ]; then
 	else
 	mkdir ~/Automation
 fi
+
 cd ~/Automation
 git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/device_monitoring.git
 git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_database.git
 git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_producer.git
 git clone https://$gitusers:$gitpasswd@git.this.my.id/automation_tools/automation_services/automation_services_consumer.git
 
+#Create Docker Compose
+echo "generating docker compose..."
+mkdir /root/Automation/automation_tools
+tee  /root/Automation/automation_tools/docker-compose.yaml <<EOF >/dev/null
+version: '2'
+
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    ports:
+      - '2181:2181'
+    environment:
+    - ALLOW_ANONYMOUS_LOGIN=yes
+    restart: 'always'
+  kafka:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '9092:9092'
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=automation_tools_zookeeper
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://$kafkahosts:9092
+    restart: 'always'
+  mariadb:
+    image: 'mariadb:latest'
+    ports:
+      - '6009:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=M1r34cl3@
+    restart: 'always'
+  redis:
+    image: 'redis:latest'
+    ports:
+      - '6379:6379'
+    restart: 'always'
+EOF
+
+#Allow Port
+sudo firewall-cmd --zone=public --permanent --add-port=4723/tcp
+sudo firewall-cmd --zone=public --permanent --add-port=8081/tcp
+sudo firewall-cmd --zone=public --permanent --add-port=9092/tcp
 sudo systemctl daemon-reload && sudo systemctl enable appiumd && sudo systemctl start appiumd
-
-#Install Docker Compose
-
-#Running docker composer
